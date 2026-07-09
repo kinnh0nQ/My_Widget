@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Widget</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    background: transparent;
+  }
+  .card {
+    max-width: 340px;
+    background: #ffffff;
+    border: 0.5px solid #e5e5e0;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .top-row { display: flex; align-items: stretch; gap: 16px; }
+  .icon-box {
+    flex-shrink: 0;
+    width: 76px;
+    border-radius: 12px;
+    background: #f5f4ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-box i { font-size: 44px; color: #5f5e5a; }
+  .info-col { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .location { font-size: 13px; color: #5f5e5a; margin: 0 0 2px; }
+  .updated { font-size: 11px; color: #888780; margin: 0; }
+  .temp-row { display: flex; align-items: baseline; gap: 8px; }
+  .temp { font-size: 32px; font-weight: 500; color: #2c2c2a; margin: 0; }
+  .range { font-size: 13px; color: #5f5e5a; }
+  .stats-row {
+    border-top: 0.5px solid #e5e5e0;
+    margin-top: 14px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .stat-label { font-size: 11px; color: #888780; margin: 0 0 2px; }
+  .stat-value { font-size: 13px; color: #2c2c2a; margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="top-row">
+    <div class="icon-box">
+      <i class="ti ti-cloud" id="wx-icon"></i>
+    </div>
+    <div class="info-col">
+      <div>
+        <p class="location">대구</p>
+        <p class="updated" id="wx-updated">불러오는 중…</p>
+      </div>
+      <div class="temp-row">
+        <span class="temp" id="wx-temp">--°</span>
+        <span class="range" id="wx-range">최고 --° · 최저 --°</span>
+      </div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div>
+      <p class="stat-label">체감</p>
+      <p class="stat-value" id="wx-feels">--°</p>
+    </div>
+    <div>
+      <p class="stat-label">습도</p>
+      <p class="stat-value" id="wx-humidity">--%</p>
+    </div>
+    <div>
+      <p class="stat-label">바람</p>
+      <p class="stat-value" id="wx-wind">-- m/s</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 위치를 바꾸고 싶으면 아래 latitude/longitude 값만 수정하면 돼
+  const LAT = 35.87;
+  const LON = 128.60;
+  const LOCATION_NAME = "대구";
+
+  document.querySelector('.location').textContent = LOCATION_NAME;
+
+  const iconMap = {
+    0: 'ti-sun', 1: 'ti-sun', 2: 'ti-cloud', 3: 'ti-cloud',
+    45: 'ti-mist', 48: 'ti-mist',
+    51: 'ti-droplet', 53: 'ti-droplet', 55: 'ti-droplet',
+    61: 'ti-cloud-rain', 63: 'ti-cloud-rain', 65: 'ti-cloud-rain',
+    71: 'ti-snowflake', 73: 'ti-snowflake', 75: 'ti-snowflake',
+    80: 'ti-cloud-rain', 81: 'ti-cloud-rain', 82: 'ti-cloud-rain',
+    95: 'ti-bolt'
+  };
+
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FSeoul`)
+    .then(r => r.json())
+    .then(d => {
+      const c = d.current;
+      document.getElementById('wx-temp').textContent = Math.round(c.temperature_2m) + '°';
+      document.getElementById('wx-feels').textContent = Math.round(c.apparent_temperature) + '°';
+      document.getElementById('wx-humidity').textContent = Math.round(c.relative_humidity_2m) + '%';
+      document.getElementById('wx-wind').textContent = c.wind_speed_10m.toFixed(1) + ' m/s';
+      document.getElementById('wx-range').textContent =
+        '최고 ' + Math.round(d.daily.temperature_2m_max[0]) + '° · 최저 ' + Math.round(d.daily.temperature_2m_min[0]) + '°';
+      const now = new Date();
+      document.getElementById('wx-updated').textContent =
+        now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ' 기준';
+      const icon = iconMap[c.weather_code] || 'ti-cloud';
+      document.getElementById('wx-icon').className = 'ti ' + icon;
+    })
+    .catch(() => {
+      document.getElementById('wx-updated').textContent = '불러오기 실패';
+    });
+</script>
+
+</body>
+</html>
