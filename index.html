@@ -9,7 +9,7 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: transparent;
+    background: #ffffff;
     height: 100%;
   }
   body {
@@ -28,26 +28,30 @@
   /* 시스템이 다크모드일 때 자동 대응 */
   @media (prefers-color-scheme: dark) {
     :root {
-      --card-bg: #2a2a28;
-      --card-border: #40403c;
-      --icon-bg: #363634;
+      --card-bg: #191919;
+      --card-border: #373737;
+      --icon-bg: #2a2a2a;
       --icon-color: #d3d1c7;
       --text-primary: #f1efe8;
       --text-secondary: #b4b2a9;
       --text-muted: #888780;
     }
+    html, body { background: #191919; }
   }
   /* URL에 ?theme=dark 를 붙이면 시스템 설정과 무관하게 강제 다크모드 (노션 앱 자체 다크모드용) */
   html.force-dark {
-    --card-bg: #2a2a28;
-    --card-border: #40403c;
-    --icon-bg: #363634;
+    background: #191919;
+    --card-bg: #191919;
+    --card-border: #373737;
+    --icon-bg: #2a2a2a;
     --icon-color: #d3d1c7;
     --text-primary: #f1efe8;
     --text-secondary: #b4b2a9;
     --text-muted: #888780;
   }
+  html.force-dark body { background: #191919; }
   html.force-light {
+    background: #ffffff;
     --card-bg: #ffffff;
     --card-border: #e5e5e0;
     --icon-bg: #f5f4ef;
@@ -56,6 +60,7 @@
     --text-secondary: #5f5e5a;
     --text-muted: #888780;
   }
+  html.force-light body { background: #ffffff; }
   .card {
     width: 100%;
     background: var(--card-bg);
