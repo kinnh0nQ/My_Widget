@@ -10,9 +10,10 @@
     margin: 0;
     padding: 0;
     background: transparent;
+    height: 100%;
   }
   body {
-    padding: 16px;
+    padding: 12px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
   }
   :root {
@@ -24,6 +25,7 @@
     --text-secondary: #5f5e5a;
     --text-muted: #888780;
   }
+  /* 시스템이 다크모드일 때 자동 대응 */
   @media (prefers-color-scheme: dark) {
     :root {
       --card-bg: #2a2a28;
@@ -35,14 +37,33 @@
       --text-muted: #888780;
     }
   }
+  /* URL에 ?theme=dark 를 붙이면 시스템 설정과 무관하게 강제 다크모드 (노션 앱 자체 다크모드용) */
+  html.force-dark {
+    --card-bg: #2a2a28;
+    --card-border: #40403c;
+    --icon-bg: #363634;
+    --icon-color: #d3d1c7;
+    --text-primary: #f1efe8;
+    --text-secondary: #b4b2a9;
+    --text-muted: #888780;
+  }
+  html.force-light {
+    --card-bg: #ffffff;
+    --card-border: #e5e5e0;
+    --icon-bg: #f5f4ef;
+    --icon-color: #5f5e5a;
+    --text-primary: #2c2c2a;
+    --text-secondary: #5f5e5a;
+    --text-muted: #888780;
+  }
   .card {
-    max-width: 340px;
+    width: 100%;
     background: var(--card-bg);
     border: 0.5px solid var(--card-border);
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1.25rem 1.5rem;
   }
-  .top-row { display: flex; align-items: stretch; gap: 16px; }
+  .top-row { display: flex; align-items: stretch; gap: 20px; }
   .icon-box {
     flex-shrink: 0;
     width: 76px;
@@ -53,16 +74,16 @@
     justify-content: center;
   }
   .icon-box svg { width: 44px; height: 44px; color: var(--icon-color); }
-  .info-col { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .info-col { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
   .location { font-size: 13px; color: var(--text-secondary); margin: 0 0 2px; }
   .updated { font-size: 11px; color: var(--text-muted); margin: 0; }
-  .temp-row { display: flex; align-items: baseline; gap: 8px; }
-  .temp { font-size: 32px; font-weight: 500; color: var(--text-primary); margin: 0; }
+  .temp-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .temp { font-size: 34px; font-weight: 500; color: var(--text-primary); margin: 0; }
   .range { font-size: 13px; color: var(--text-secondary); }
   .stats-row {
     border-top: 0.5px solid var(--card-border);
-    margin-top: 14px;
-    padding-top: 10px;
+    margin-top: 16px;
+    padding-top: 12px;
     display: flex;
     justify-content: space-between;
   }
@@ -110,7 +131,12 @@
 
   document.querySelector('.location').textContent = LOCATION_NAME;
 
-  // 인라인 SVG 아이콘 (외부 폰트 의존 없이 항상 렌더링됨, currentColor로 다크모드 자동 대응)
+  // URL에 ?theme=dark 또는 ?theme=light 를 붙이면 강제 적용됨
+  const params = new URLSearchParams(window.location.search);
+  const theme = params.get('theme');
+  if (theme === 'dark') document.documentElement.classList.add('force-dark');
+  if (theme === 'light') document.documentElement.classList.add('force-light');
+
   const icons = {
     sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>',
     cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 18a4 4 0 0 1-.4-8 5.5 5.5 0 0 1 10.6-1.8A4.2 4.2 0 0 1 17 18H6.5Z"/></svg>',
